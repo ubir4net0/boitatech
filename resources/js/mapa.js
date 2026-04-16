@@ -14,6 +14,7 @@ const TIPO_ALERTA_VALIDOS = new Set([
 const state = {
     viewer: null,
     dataSource: null,
+    isReady: false,
     currentPage: 1,
     hasMore: true,
     activeRequestId: 0,
@@ -35,10 +36,14 @@ const updateStatus = (text) => {
     ui.status.textContent = text;
 };
 
+const updateLoadMoreButtonState = () => {
+    ui.loadMoreBtn.disabled = !state.isReady || state.loadingCount > 0 || !state.hasMore;
+};
+
 const setLoading = (isLoading) => {
     state.loadingCount = Math.max(0, state.loadingCount + (isLoading ? 1 : -1));
     ui.loading.dataset.active = state.loadingCount > 0 ? 'true' : 'false';
-    ui.loadMoreBtn.disabled = state.loadingCount > 0 || !state.hasMore;
+    updateLoadMoreButtonState();
 };
 
 const toSafeNumber = (value, min, max) => {
@@ -228,6 +233,11 @@ const bindTooltip = () => {
 };
 
 const loadAlertas = async ({ append = false } = {}) => {
+    if (!state.isReady || !state.viewer || !state.dataSource) {
+        updateStatus('Mapa ainda não inicializado. Configure o token CESIUM_ION_TOKEN no .env.');
+        return;
+    }
+
     const requestId = ++state.activeRequestId;
     const targetPage = append ? state.currentPage + 1 : 1;
 
@@ -245,7 +255,7 @@ const loadAlertas = async ({ append = false } = {}) => {
         renderAlertas(alertas, append);
         state.currentPage = targetPage;
         state.hasMore = hasMore;
-        ui.loadMoreBtn.disabled = !state.hasMore;
+        updateLoadMoreButtonState();
 
         updateStatus(
             `Alertas carregados: ${state.dataSource.entities.values.length} • Página ${state.currentPage}`,
@@ -316,6 +326,8 @@ const setupViewer = async () => {
 
     state.dataSource = new window.Cesium.CustomDataSource('alertas-amazonia');
     state.viewer.dataSources.add(state.dataSource);
+    state.isReady = true;
+    updateLoadMoreButtonState();
 
     bindTooltip();
 
@@ -333,7 +345,7 @@ const setupViewer = async () => {
 
 const bootstrap = async () => {
     ui.loadMoreBtn.addEventListener('click', () => {
-        if (state.hasMore) {
+        if (state.isReady && state.hasMore) {
             loadAlertas({ append: true });
         }
     });
@@ -344,6 +356,9 @@ const bootstrap = async () => {
         await loadAlertas({ append: false });
     } catch (error) {
         console.error(error);
+        state.isReady = false;
+        state.hasMore = false;
+        updateLoadMoreButtonState();
         updateStatus('Erro ao inicializar o mapa. Verifique o token Cesium no .env.');
         setLoading(false);
     }
