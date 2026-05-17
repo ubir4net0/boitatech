@@ -124,22 +124,7 @@ Para limpar e reexecutar seeders:
 - `resources/js` – frontend modular (mapas, denúncias, notícias)
 - `resources/views` – templates Blade
 
-## Segurança
 
-- Nunca suba `.env` para o repositório.
-- Gere `APP_KEY` em cada ambiente.
-- Use `APP_DEBUG=false` em produção.
-- Configure tokens (ex.: `CESIUM_ION_TOKEN`) somente por variáveis de ambiente.
-- Revise permissões de diretório em `storage/` e `bootstrap/cache/`.
 
-## Deploy (resumo)
 
-1. `composer install --no-dev --optimize-autoloader`
-2. `npm ci && npm run build`
-3. `php artisan migrate --force`
-4. `php artisan storage:link`
-5. `php artisan config:cache && php artisan route:cache && php artisan view:cache`
 
-## Licença
-
-Uso acadêmico e institucional conforme política do projeto BoitaTech.
