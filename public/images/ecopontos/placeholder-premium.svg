@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A121A"/>
+      <stop offset="1" stop-color="#071A12"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(360 420) rotate(22) scale(420 260)">
+      <stop stop-color="#3DFF9A" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#3DFF9A" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <rect width="1280" height="720" fill="url(#glow)"/>
+  <g opacity="0.9">
+    <circle cx="640" cy="300" r="68" fill="#3DFF9A" fill-opacity="0.18"/>
+    <path d="M640 244C670.928 244 696 269.072 696 300C696 330.928 670.928 356 640 356C609.072 356 584 330.928 584 300C584 269.072 609.072 244 640 244ZM640 268C622.327 268 608 282.327 608 300C608 317.673 622.327 332 640 332C657.673 332 672 317.673 672 300C672 282.327 657.673 268 640 268Z" fill="#3DFF9A"/>
+  </g>
+  <text x="640" y="430" fill="#EAFBF2" font-size="40" font-family="Arial, sans-serif" font-weight="700" text-anchor="middle">Imagem do ecoponto em atualização</text>
+  <text x="640" y="472" fill="#A9C9B8" font-size="24" font-family="Arial, sans-serif" text-anchor="middle">Adicione arquivos em public/images/ecopontos/*.webp</text>
+</svg>

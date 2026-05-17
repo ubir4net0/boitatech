@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -8,4 +8,104 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-slate-950 text-slate-100;
+    }
+
+    ::selection {
+        @apply bg-emerald-500/30 text-emerald-100;
+    }
+}
+
+@layer components {
+    .card-glass {
+        @apply rounded-2xl border border-slate-800/60 bg-slate-900/70 backdrop-blur-sm transition duration-300;
+    }
+
+    .card-hover {
+        @apply hover:border-emerald-500/40 hover:shadow-lg hover:shadow-emerald-500/10;
+    }
+
+    .badge-category {
+        @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide border transition;
+    }
+
+    .badge-emerald {
+        @apply border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20;
+    }
+
+    .badge-slate {
+        @apply border-slate-700/50 bg-slate-800/40 text-slate-300 hover:bg-slate-800/60;
+    }
+
+    .text-gradient {
+        @apply bg-gradient-to-r bg-clip-text text-transparent;
+    }
+
+    .glow-emerald {
+        @apply shadow-lg shadow-emerald-500/20;
+    }
+
+    .glow-orange {
+        @apply shadow-lg shadow-orange-500/20;
+    }
+
+    .btn-primary {
+        @apply rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-300 transition hover:border-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-200;
+    }
+
+    .btn-secondary {
+        @apply rounded-lg border border-slate-700 bg-slate-800/30 px-4 py-2 text-sm font-semibold text-slate-300 transition hover:border-slate-600 hover:bg-slate-800/60;
+    }
+
+    .divider-accent {
+        @apply w-1 h-6 bg-gradient-to-b from-emerald-400 to-transparent rounded-full;
+    }
+}
+
+@layer utilities {
+    .animate-float {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .line-clamp-1 {
+        @apply overflow-hidden text-ellipsis line-clamp-1;
+    }
+
+    .line-clamp-2 {
+        @apply overflow-hidden text-ellipsis line-clamp-2;
+    }
+
+    .line-clamp-3 {
+        @apply overflow-hidden text-ellipsis line-clamp-3;
+    }
+
+    .backdrop-blur-xs {
+        backdrop-filter: blur(2px);
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
 }

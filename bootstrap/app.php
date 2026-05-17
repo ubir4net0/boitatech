@@ -12,7 +12,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->web(prepend: [
+            \App\Http\Middleware\SecureWebHeaders::class,
+        ]);
+
+        // Injeta cabeçalhos de segurança em todas as rotas da API pública
+        $middleware->api(prepend: [
+            \App\Http\Middleware\SecureApiHeaders::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -1,58 +1,145 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# BoitaTech
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Plataforma de monitoramento ambiental com foco em visualização geoespacial, denúncias cidadãs, ecopontos e curadoria de notícias ambientais.
 
-## About Laravel
+## Sobre o projeto
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+O BoitaTech integra dados ambientais em mapas 2D/3D e disponibiliza ferramentas para:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- monitoramento de focos e camadas ambientais;
+- recebimento de denúncias públicas com consentimento LGPD;
+- consulta de ecopontos de coleta;
+- leitura de notícias ambientais (BoitaNews).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Tecnologias utilizadas
 
-## Learning Laravel
+- PHP 8.3+
+- Laravel 13
+- PostgreSQL (principal e geoespacial)
+- Vite 8
+- JavaScript ES6+
+- Leaflet
+- CesiumJS
+- Tailwind CSS
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Requisitos
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- PHP 8.3 ou superior
+- Composer 2.7+
+- Node.js 20+ e npm 10+
+- PostgreSQL 14+ (recomendado 15/16)
+- Extensões PHP recomendadas: `pdo_pgsql`, `mbstring`, `openssl`, `fileinfo`, `intl`, `ctype`, `json`
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## Instalação completa
 
-## Agentic Development
+### 1) Clonar projeto
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+1. `git clone <url-do-repositorio>`
+2. `cd boitatech`
 
-```bash
-composer require laravel/boost --dev
+### 2) Backend (Laravel)
 
-php artisan boost:install
-```
+1. `composer install`
+2. `copy .env.example .env` (Windows) ou `cp .env.example .env` (Linux/macOS)
+3. Ajustar variáveis no `.env`
+4. `php artisan key:generate`
+5. `php artisan migrate --force`
+6. `php artisan db:seed --force`
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 3) Frontend (Vite)
 
-## Contributing
+1. `npm install`
+2. `npm run build` (produção) ou `npm run dev` (desenvolvimento)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 4) Storage
 
-## Code of Conduct
+1. `php artisan storage:link`
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 5) Limpeza e cache
 
-## Security Vulnerabilities
+1. `php artisan optimize:clear`
+2. `php artisan config:cache`
+3. `php artisan route:cache`
+4. `php artisan view:cache`
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Configuração PostgreSQL
 
-## License
+Crie um banco com UTF-8 e permissões para o usuário da aplicação.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Configuração mínima no `.env`:
+
+- `DB_CONNECTION=pgsql`
+- `DB_HOST=127.0.0.1`
+- `DB_PORT=5432`
+- `DB_DATABASE=boitatech`
+- `DB_USERNAME=seu_usuario`
+- `DB_PASSWORD=sua_senha`
+
+Para ambiente com conexão geoespacial dedicada (mesmo servidor ou outro), configure também:
+
+- `DB_PGSQL_HOST`
+- `DB_PGSQL_PORT`
+- `DB_PGSQL_DATABASE`
+- `DB_PGSQL_USERNAME`
+- `DB_PGSQL_PASSWORD`
+
+## Como rodar o projeto
+
+Terminal 1:
+
+1. `php artisan serve`
+
+Terminal 2:
+
+1. `npm run dev`
+
+Aplicação disponível em: `http://127.0.0.1:8000`
+
+## Ambiente limpo para apresentação
+
+Para remover denúncias existentes, limpar uploads de denúncias e limpar cache:
+
+1. `php artisan boitatech:prepare-presentation`
+
+Para limpar e reexecutar seeders:
+
+1. `php artisan boitatech:prepare-presentation --seed`
+
+## Funcionalidades
+
+- **Mapa ambiental 2D (Leaflet):** hotspots, heatmap e filtros temporais.
+- **Mapa ambiental 3D (Cesium):** visualização de camadas ambientais e operações em escala Brasil.
+- **Denúncias:** cadastro público com validação e confirmação.
+- **Ecopontos:** consulta de locais de coleta e materiais aceitos.
+- **BoitaNews:** feed curado de notícias ambientais.
+
+## Estrutura do projeto
+
+- `app/Http/Controllers` – controladores web e API
+- `app/Services` – serviços de domínio e integrações
+- `app/Models` – modelos Eloquent
+- `app/Console/Commands` – comandos artisan operacionais
+- `database/migrations` – versionamento de banco
+- `database/seeders` – dados iniciais
+- `resources/js` – frontend modular (mapas, denúncias, notícias)
+- `resources/views` – templates Blade
+
+## Segurança
+
+- Nunca suba `.env` para o repositório.
+- Gere `APP_KEY` em cada ambiente.
+- Use `APP_DEBUG=false` em produção.
+- Configure tokens (ex.: `CESIUM_ION_TOKEN`) somente por variáveis de ambiente.
+- Revise permissões de diretório em `storage/` e `bootstrap/cache/`.
+
+## Deploy (resumo)
+
+1. `composer install --no-dev --optimize-autoloader`
+2. `npm ci && npm run build`
+3. `php artisan migrate --force`
+4. `php artisan storage:link`
+5. `php artisan config:cache && php artisan route:cache && php artisan view:cache`
+
+## Licença
+
+Uso acadêmico e institucional conforme política do projeto BoitaTech.

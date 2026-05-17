@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">BoitaNews - Imagem editorial</title>
+  <desc id="desc">Banner editorial ambiental do BoitaNews para matérias sem imagem original</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="55%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#052e16"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="1320" cy="130" r="180" fill="#10b981" opacity="0.12"/>
+  <circle cx="210" cy="760" r="220" fill="#f97316" opacity="0.10"/>
+  <rect x="120" y="130" width="1360" height="640" rx="28" fill="#020617" opacity="0.45" stroke="#1e293b"/>
+  <rect x="120" y="130" width="1360" height="7" fill="url(#accent)"/>
+  <text x="200" y="310" fill="#e2e8f0" font-family="'Instrument Sans', Arial, sans-serif" font-size="68" font-weight="700">BoitaNews</text>
+  <text x="200" y="380" fill="#86efac" font-family="'Instrument Sans', Arial, sans-serif" font-size="38" font-weight="600">Curadoria Editorial Ambiental Brasileira</text>
+  <text x="200" y="455" fill="#cbd5e1" font-family="'Instrument Sans', Arial, sans-serif" font-size="30">Imagem oficial indisponível na fonte original.</text>
+  <text x="200" y="510" fill="#94a3b8" font-family="'Instrument Sans', Arial, sans-serif" font-size="26">Conteúdo validado por relevância ambiental e contexto brasileiro.</text>
+  <text x="200" y="650" fill="#f8fafc" font-family="'Instrument Sans', Arial, sans-serif" font-size="24" letter-spacing="2">AMAZÔNIA • BIOMAS • FISCALIZAÇÃO • CLIMA</text>
+</svg>
