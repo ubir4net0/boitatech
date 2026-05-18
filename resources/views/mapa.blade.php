@@ -974,6 +974,7 @@
                                 <button id="carregarMaisBtn" class="secondary" type="button" disabled>Carregar mais pontos</button>
                                 <button id="toggleHandCesiumBtn" class="secondary" type="button" aria-pressed="false">🖐️ Hand Tracking 3D</button>
                                 <a href="{{ route('mapa.interativo') }}" class="action-link secondary" aria-label="Abrir mapa interativo com hand tracking">🖐️ Mapa Interativo</a>
+                                <a href="{{ route('dashboard.index') }}" class="action-link secondary" aria-label="Abrir central de comando ambiental">🌎 Central de Comando</a>
                             </div>
 
                             <div class="hand-state-chip" aria-live="polite">

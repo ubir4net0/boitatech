@@ -174,7 +174,7 @@
                 <div class="title">🖐️ Mapa Interativo</div>
                 <div class="subtitle">Modo Leaflet operacional premium</div>
             </div>
-            <a class="btn ghost" href="{{ route('mapa.index') }}">Voltar 3D</a>
+            <a class="btn ghost" href="{{ route('dashboard.index') }}">Central</a>
         </div>
 
         <div class="card actions">

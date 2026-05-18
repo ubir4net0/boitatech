@@ -39,16 +39,17 @@ class SecureWebHeaders
      */
     private function buildCspDirectives(bool $isDev): array
     {
-        $cesiumAndMapProviders = [
+        // Domínios de mapas (Cesium, Leaflet, tiles)
+        $mapProviders = [
             'https://cesium.com',
             'https://*.cesium.com',
             'https://assets.ion.cesium.com',
-            'https://cdn.jsdelivr.net',
-            'https://storage.googleapis.com',
+            'https://tile.openstreetmap.org',
+            'https://*.tile.openstreetmap.org',
+            'https://*.basemaps.cartocdn.com',
             'https://services.arcgisonline.com',
             'https://server.arcgisonline.com',
-            'https://tile.openstreetmap.org',
-            'https://*.basemaps.cartocdn.com',
+            'https://*.arcgisonline.com',
             'https://dev.virtualearth.net',
             'https://ecn.t0.tiles.virtualearth.net',
             'https://ecn.t1.tiles.virtualearth.net',
@@ -58,16 +59,25 @@ class SecureWebHeaders
             'https://*.mapbox.com',
         ];
 
+        // CDNs para bibliotecas (Chart.js pode estar aqui)
+        $cdnProviders = [
+            'https://cdn.jsdelivr.net',
+            'https://unpkg.com',
+            'https://storage.googleapis.com',
+        ];
+
         // Em localhost HTTP, alguns providers retornam tiles com uriScheme=http.
         // Mantemos HTTP apenas no modo dev para preservar segurança em produção.
         if ($isDev) {
-            $cesiumAndMapProviders = [
-                ...$cesiumAndMapProviders,
+            $mapProviders = [
+                ...$mapProviders,
                 'http://dev.virtualearth.net',
                 'http://ecn.t0.tiles.virtualearth.net',
                 'http://ecn.t1.tiles.virtualearth.net',
                 'http://ecn.t2.tiles.virtualearth.net',
                 'http://ecn.t3.tiles.virtualearth.net',
+                'http://tile.openstreetmap.org',
+                'http://*.tile.openstreetmap.org',
             ];
         }
 
@@ -96,9 +106,11 @@ class SecureWebHeaders
             'wss://127.0.0.1:5175',
         ];
 
+        $allProviders = [...$mapProviders, ...$cdnProviders];
+
         // blob: é necessário para Cesium workers: importScripts() dentro de blob workers
         // é validado contra script-src pelo Chrome/Firefox.
-        $scriptBase = ["'self'", "'unsafe-inline'", 'blob:', ...$cesiumAndMapProviders];
+        $scriptBase = ["'self'", "'unsafe-inline'", 'blob:', ...$allProviders];
         if ($isDev) {
             // Necessário para Vite/HMR em dev; removido em produção.
             $scriptBase[] = "'unsafe-eval'";
@@ -116,13 +128,23 @@ class SecureWebHeaders
             $styleBase = [...$styleBase, ...$viteHttp];
         }
 
-        $imgBase = ["'self'", 'data:', 'blob:', ...$cesiumAndMapProviders];
-        $connectBase = ["'self'", ...$cesiumAndMapProviders];
+        // img-src: tiles, worker blobs, CDN images
+        $imgBase = ["'self'", 'data:', 'blob:', ...$allProviders];
+
+        // connect-src: API calls, WebSocket para HMR, tiles
+        $connectBase = ["'self'", ...$allProviders];
         if ($isDev) {
             $connectBase = [...$connectBase, ...$viteHttp, ...$viteWs];
         }
 
-        $workerBase = ["'self'", 'blob:', 'https://cesium.com', 'https://*.cesium.com', 'https://assets.ion.cesium.com'];
+        $workerBase = [
+            "'self'",
+            'blob:',
+            'https://cesium.com',
+            'https://*.cesium.com',
+            'https://assets.ion.cesium.com',
+            ...$cdnProviders,
+        ];
         if ($isDev) {
             $workerBase = [...$workerBase, ...$viteHttp];
         }

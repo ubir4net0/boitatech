@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\NewsSourcesController;
 use App\Http\Controllers\BoitaNewsController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DenunciaController;
 use App\Http\Controllers\EcopontoController;
 use App\Http\Controllers\LgpdController;
@@ -16,6 +17,10 @@ Route::get('/', function () {
 
 Route::get('/mapa', [MapaController::class, 'index'])->name('mapa.index');
 Route::get('/mapa-interativo', [MapaInterativoController::class, 'index'])->name('mapa.interativo');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+Route::get('/dashboard/data', [DashboardController::class, 'data'])
+    ->middleware('throttle:60,1')
+    ->name('dashboard.data');
 Route::get('/boitanews', BoitaNewsController::class)->name('boitanews.index');
 Route::get('/ecopontos', [EcopontoController::class, 'index'])->name('ecopontos.index');
 Route::get('/ecopontos/{ecoponto}', [EcopontoController::class, 'show'])->name('ecopontos.show');

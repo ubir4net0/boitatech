@@ -1022,6 +1022,7 @@
             <a href="#denuncias">Denúncias</a>
             <a href="#ecopontos">Ecopontos</a>
             <a href="#noticias">BoitaNews</a>
+            <a href="{{ route('dashboard.index') }}">Central</a>
         </nav>
 
 
@@ -1137,6 +1138,10 @@
                     <div class="section-actions">
                         <a href="{{ route('mapa.index') }}" class="btn btn--primary">
                             <span>Explorar plataforma</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                        </a>
+                        <a href="{{ route('dashboard.index') }}" class="btn btn--ghost">
+                            <span>Central de Comando</span>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                         </a>
                     </div>
