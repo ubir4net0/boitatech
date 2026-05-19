@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Denuncia extends Model
 {
+    private const DEFAULT_PUBLIC_LAT = -14.2350;
+
+    private const DEFAULT_PUBLIC_LNG = -51.9253;
+
     private const STATE_NAMES = [
         'AC' => 'Acre',
         'AL' => 'Alagoas',
@@ -161,7 +165,9 @@ class Denuncia extends Model
         $seed = crc32($this->id . 'lat' . substr((string) config('app.key'), 0, 12));
         $offset = (($seed % 100) - 50) / 10000; // ±0.005 deg ≈ ±550 m
 
-        return round($this->latitude + $offset, 4);
+        $baseLatitude = is_numeric($this->latitude) ? (float) $this->latitude : self::DEFAULT_PUBLIC_LAT;
+
+        return round($baseLatitude + $offset, 4);
     }
 
     /**
@@ -172,13 +178,15 @@ class Denuncia extends Model
         $seed = crc32($this->id . 'lng' . substr((string) config('app.key'), 0, 12));
         $offset = (($seed % 100) - 50) / 10000;
 
-        return round($this->longitude + $offset, 4);
+        $baseLongitude = is_numeric($this->longitude) ? (float) $this->longitude : self::DEFAULT_PUBLIC_LNG;
+
+        return round($baseLongitude + $offset, 4);
     }
 
     public function approximateRegion(): string
     {
-        $local = $this->bairro ?: ($this->endereco_aproximado ?: $this->cidade);
-        $state = self::STATE_NAMES[$this->estado] ?? $this->estado;
+        $local = $this->bairro ?: ($this->endereco_aproximado ?: $this->cidade ?: 'região não informada');
+        $state = self::STATE_NAMES[$this->estado] ?? ($this->estado ?: 'UF não informada');
 
         return sprintf('Região próxima de %s — %s', $local, $state);
     }

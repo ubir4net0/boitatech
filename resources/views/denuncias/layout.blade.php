@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <meta name="boitatech-pdf-error" content="{{ session('pdf_error', '') }}" />
     <meta name="theme-color" content="#050505" />
     <title>@yield('title', 'BoitaTech — Mapa de Denúncias Ambientais')</title>
     <meta name="description" content="@yield('description', 'Mapa colaborativo de denúncias ambientais georreferenciadas do Brasil.')" />
@@ -31,6 +32,7 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { min-height: 100%; background: var(--black-1); color: var(--white-soft); font-family: var(--font-body); overflow-x: hidden; }
+        body.drawer-open { overflow: hidden; }
         body {
             background:
                 radial-gradient(circle at top, rgba(61,255,154,0.09), transparent 26%),
@@ -84,7 +86,39 @@
             background: linear-gradient(135deg, var(--green-glow), var(--green-neon));
             box-shadow: 0 12px 34px -18px rgba(61,255,154,0.62);
         }
+        .btn.is-busy {
+            opacity: 0.78;
+            pointer-events: none;
+            filter: saturate(0.7);
+        }
         .btn--ghost { background: rgba(255,255,255,0.04); }
+
+        .toast-stack {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 220;
+            display: grid;
+            gap: 10px;
+            width: min(420px, calc(100vw - 24px));
+            pointer-events: none;
+        }
+        .toast {
+            border-radius: 14px;
+            padding: 12px 14px;
+            border: 1px solid rgba(239,68,68,0.28);
+            background: rgba(44,8,10,0.92);
+            color: #fee2e2;
+            box-shadow: 0 16px 40px -22px rgba(248,113,113,0.55);
+            pointer-events: auto;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity .22s ease, transform .22s ease;
+        }
+        .toast.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
         .ops-stage { position: relative; padding: 14px 0 22px; }
         .ops-map-shell {
@@ -165,18 +199,30 @@
         .preview-card__meta { display: flex; flex-wrap: wrap; gap: 8px; color: var(--gray-text); font-size: 12px; }
 
         .ops-drawer {
-            position: fixed; top: 0; right: 0; z-index: 160;
-            width: min(460px, 100vw); height: 100vh;
-            padding: 88px 18px 18px;
+            position: fixed; inset: 0 0 0 auto; z-index: 160;
+            width: min(480px, 100vw);
+            height: 100dvh;
+            padding: 78px 16px 16px;
             transform: translateX(100%);
-            transition: transform .32s var(--ease-cinema);
-            background: rgba(5,5,5,0.78);
+            transition: transform .34s var(--ease-cinema);
+            background: rgba(5,5,5,0.72);
             backdrop-filter: blur(22px) saturate(150%);
             border-left: 1px solid rgba(61,255,154,0.14);
+            overflow: hidden;
         }
         .ops-drawer.is-open { transform: translateX(0); }
+        .ops-drawer__panel {
+            position: relative;
+            height: 100%;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            padding: 18px;
+            border-radius: 22px;
+        }
         .ops-backdrop {
-            position: fixed; inset: 0; z-index: 150; background: rgba(0,0,0,0.45);
+            position: fixed; inset: 0; z-index: 145;
+            background: rgba(2,6,23,0.32);
+            backdrop-filter: blur(2px);
             opacity: 0; pointer-events: none; transition: opacity .24s ease;
         }
         .ops-backdrop.is-open { opacity: 1; pointer-events: auto; }
@@ -343,8 +389,18 @@
         /* ============ MAP SECTION (COLLAPSIBLE) ============ */
         .map-section { padding: 0 0 32px; }
         .map-section__toggle { display: flex; align-items: center; gap: 10px; padding: 14px 0; }
-        .map-collapsible { display: none; }
-        .map-collapsible.is-open { display: block; }
+        .map-collapsible {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            pointer-events: none;
+            transition: max-height .34s var(--ease-cinema), opacity .26s var(--ease-cinema);
+        }
+        .map-collapsible.is-open {
+            max-height: 680px;
+            opacity: 1;
+            pointer-events: auto;
+        }
         .map-wrap { position: relative; height: 560px; border-radius: 24px; overflow: hidden; border: 1px solid rgba(61,255,154,0.1); }
         .map-wrap #denunciasLeafletMain { position: absolute; inset: 0; }
 
@@ -383,6 +439,13 @@
             .feed-hero__kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
             .gallery__primary { height: 260px; }
             .gallery__thumb { height: 110px; }
+            .ops-drawer {
+                width: 100vw;
+                padding: 66px 10px 10px;
+                border-left: none;
+            }
+            .ops-drawer__panel { padding: 14px; }
+            .map-wrap { height: 430px; }
         }
     </style>
 </head>
@@ -407,6 +470,7 @@
     @yield('content')
 
     <div class="ops-backdrop" data-report-backdrop></div>
+    <div class="toast-stack" data-toast-stack aria-live="polite" aria-atomic="true"></div>
     @stack('scripts')
 </body>
 </html>

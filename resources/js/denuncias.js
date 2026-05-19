@@ -67,6 +67,31 @@ const setText = (selector, value) => {
     if (el) el.textContent = value;
 };
 
+const pushToast = (message, { duration = 4800 } = {}) => {
+    const stack = document.querySelector('[data-toast-stack]');
+    if (!stack || !message) return;
+
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = String(message);
+    stack.appendChild(toast);
+
+    requestAnimationFrame(() => {
+        toast.classList.add('is-visible');
+    });
+
+    window.setTimeout(() => {
+        toast.classList.remove('is-visible');
+        window.setTimeout(() => toast.remove(), 260);
+    }, duration);
+};
+
+const readFlashPdfError = () => {
+    const meta = document.querySelector('meta[name="boitatech-pdf-error"]');
+    const message = meta?.content?.trim();
+    return message || null;
+};
+
 
 const debounce = (fn, wait = 300) => {
     let timer;
@@ -74,6 +99,24 @@ const debounce = (fn, wait = 300) => {
         clearTimeout(timer);
         timer = window.setTimeout(() => fn(...args), wait);
     };
+};
+
+const queueMapReflow = ({ includeMain = true, includeReport = true, mainItems = null } = {}) => {
+    const sync = () => {
+        if (includeMain && state.mainMap) {
+            state.mainMap.invalidateSize();
+            if (state.viewMode === 'map') {
+                renderMainMap(Array.isArray(mainItems) ? mainItems : state.items);
+            }
+        }
+        if (includeReport && state.reportMap) {
+            state.reportMap.invalidateSize();
+        }
+    };
+
+    requestAnimationFrame(sync);
+    window.setTimeout(sync, 90);
+    window.setTimeout(sync, 220);
 };
 
 const setLoading = (loading) => {
@@ -912,7 +955,7 @@ const bindMapToggle = () => {
 
     syncMapUiState();
     if (state.viewMode === 'map') {
-        window.setTimeout(() => renderViewer(state.items), 80);
+        queueMapReflow({ includeMain: true, includeReport: false, mainItems: state.items });
     }
 
     btn.addEventListener('click', () => {
@@ -920,8 +963,8 @@ const bindMapToggle = () => {
         btn.textContent = isOpen ? '🗺️ Fechar mapa' : '🗺️ Ver no mapa';
         state.viewMode = isOpen ? 'map' : 'feed';
         if (isOpen) {
-            // Lazy-init Leaflet and populate with current items
-            window.setTimeout(() => renderViewer(state.items), 80);
+            // Lazy-init Leaflet and reflow após transição de altura
+            queueMapReflow({ includeMain: true, includeReport: false, mainItems: state.items });
         }
     });
 };
@@ -1076,6 +1119,7 @@ const bindForm = () => {
 const initShowPage = () => {
     const mapContainer = document.getElementById('denunciaLeaflet');
     const confirmButton = document.getElementById('confirmarDenuncia');
+    const pdfButton = document.getElementById('baixarDenunciaPdf');
     if (!mapContainer) return;
 
     const denuncia = page.denuncia ?? {};
@@ -1105,6 +1149,78 @@ const initShowPage = () => {
     }).addTo(map);
 
     marker.bindPopup(`<div style="min-width:220px;background:#050505;color:#f5f5f5;padding:6px 0;"><strong>${safeTitulo}</strong><br>${safeCidade} &bull; ${safeEstado}</div>`);
+
+    pdfButton?.addEventListener('click', async (event) => {
+        event.preventDefault();
+
+        const pdfUrl = page.pdfUrl || pdfButton.getAttribute('href');
+        if (!pdfUrl) {
+            pushToast('Não foi possível gerar o PDF no momento.');
+            return;
+        }
+
+        const original = pdfButton.textContent;
+        pdfButton.classList.add('is-busy');
+        pdfButton.setAttribute('aria-busy', 'true');
+        pdfButton.textContent = 'Gerando PDF...';
+
+        try {
+            const response = await fetch(pdfUrl, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/pdf, application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                credentials: 'same-origin',
+            });
+
+            if (!response.ok) {
+                let message = 'Não foi possível gerar o PDF no momento.';
+                const contentType = response.headers.get('content-type') || '';
+
+                if (contentType.includes('application/json')) {
+                    const payload = await response.json().catch(() => null);
+                    message = payload?.message || message;
+                }
+
+                throw new Error(message);
+            }
+
+            const blob = await response.blob();
+            if (!blob || blob.size === 0) {
+                throw new Error('Não foi possível gerar o PDF no momento.');
+            }
+
+            const contentDisposition = response.headers.get('content-disposition') || '';
+            const matched = /filename\*?=(?:UTF-8''|"?)([^";\n]+)/i.exec(contentDisposition);
+            const rawFileName = (matched?.[1] || '').replace(/"/g, '').trim();
+            let safeFileName = `denuncia-${denuncia.id || 'relatorio'}.pdf`;
+            if (rawFileName) {
+                try {
+                    safeFileName = decodeURIComponent(rawFileName);
+                } catch {
+                    safeFileName = rawFileName;
+                }
+            }
+
+            const downloadUrl = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = safeFileName;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(downloadUrl);
+        } catch (error) {
+            pushToast(error?.message || 'Não foi possível gerar o PDF no momento.');
+        } finally {
+            pdfButton.classList.remove('is-busy');
+            pdfButton.removeAttribute('aria-busy');
+            if (original) {
+                pdfButton.textContent = original;
+            }
+        }
+    });
 
     confirmButton?.addEventListener('click', async () => {
         confirmButton.disabled = true;
@@ -1138,23 +1254,39 @@ const boot = () => {
     const hasShow = document.getElementById('denunciaLeaflet');
     const drawer = document.querySelector('[data-report-drawer]');
     const backdrop = document.querySelector('[data-report-backdrop]');
+    const flashPdfError = readFlashPdfError();
+
+    if (flashPdfError) {
+        pushToast(flashPdfError);
+    }
 
     const openDrawer = () => {
         drawer?.classList.add('is-open');
         backdrop?.classList.add('is-open');
-        window.setTimeout(() => {
-            state.reportMap?.invalidateSize?.();
-        }, 60);
+        document.body.classList.add('drawer-open');
+        queueMapReflow({ includeMain: true, includeReport: true });
     };
 
     const closeDrawer = () => {
         drawer?.classList.remove('is-open');
         backdrop?.classList.remove('is-open');
+        document.body.classList.remove('drawer-open');
+        queueMapReflow({ includeMain: true, includeReport: true });
     };
 
     document.querySelectorAll('[data-open-report]').forEach((button) => button.addEventListener('click', openDrawer));
     document.querySelectorAll('[data-close-report]').forEach((button) => button.addEventListener('click', closeDrawer));
     backdrop?.addEventListener('click', closeDrawer);
+    window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && drawer?.classList.contains('is-open')) {
+            closeDrawer();
+        }
+    });
+
+    const onResize = debounce(() => {
+        queueMapReflow({ includeMain: true, includeReport: true });
+    }, 220);
+    window.addEventListener('resize', onResize, { passive: true });
 
     if (hasIndex) {
         bindFilters();

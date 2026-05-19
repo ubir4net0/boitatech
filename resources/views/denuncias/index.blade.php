@@ -130,8 +130,10 @@
 
 {{-- ====== REPORT DRAWER ====== --}}
 <aside class="ops-drawer" data-report-drawer>
-    <div class="form-card glass" style="height:100%;overflow-y:auto;">
-        <button type="button" class="btn btn--ghost" data-close-report style="position:absolute;top:14px;right:14px;padding:6px 12px;font-size:12px;">✕ Fechar</button>
+    <div class="form-card glass ops-drawer__panel">
+        <div style="display:flex; justify-content:flex-end; margin-bottom:10px; position:sticky; top:0; z-index:2; padding-bottom:8px; background:linear-gradient(180deg, rgba(15,25,35,0.95), rgba(15,25,35,0.75) 70%, transparent);">
+            <button type="button" class="btn btn--ghost" data-close-report style="padding:6px 12px;font-size:12px;">✕ Fechar</button>
+        </div>
 
         <h2>Registrar denúncia</h2>
         <p class="form-subtitle">Anônima · Pública imediatamente · Geolocalização automática</p>

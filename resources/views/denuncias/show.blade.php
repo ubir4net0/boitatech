@@ -8,6 +8,7 @@
     window.BOITATECH_DENUNCIAS_PAGE = {!! json_encode([
         'mode'       => 'show',
         'indexUrl'   => route('denuncias.index'),
+        'pdfUrl'     => route('denuncias.pdf', $denuncia),
         'apiConfirm' => route('api.denuncias.confirm', $denuncia),
         'csrf'       => csrf_token(),
         'categories' => $categories,
@@ -116,6 +117,7 @@
                 </div>
             </div>
 
+            <a href="{{ route('denuncias.pdf', $denuncia) }}" id="baixarDenunciaPdf" class="btn btn--primary" style="justify-content:center;">📄 Baixar PDF</a>
             <a href="{{ route('denuncias.index') }}" class="btn btn--ghost" style="justify-content:center;">← Voltar ao feed</a>
 
         </aside>

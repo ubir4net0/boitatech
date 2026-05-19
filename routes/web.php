@@ -25,6 +25,9 @@ Route::get('/boitanews', BoitaNewsController::class)->name('boitanews.index');
 Route::get('/ecopontos', [EcopontoController::class, 'index'])->name('ecopontos.index');
 Route::get('/ecopontos/{ecoponto}', [EcopontoController::class, 'show'])->name('ecopontos.show');
 Route::get('/denuncias', [DenunciaController::class, 'index'])->name('denuncias.index');
+Route::get('/denuncias/{denuncia}/pdf', [DenunciaController::class, 'pdf'])
+    ->middleware('throttle:20,1')
+    ->name('denuncias.pdf');
 Route::get('/denuncias/{denuncia}', [DenunciaController::class, 'show'])->name('denuncias.show');
 Route::get('/privacidade', [LgpdController::class, 'privacy'])->name('lgpd.privacy');
 Route::get('/lgpd/solicitacoes', [LgpdController::class, 'requestForm'])->name('lgpd.requests.form');
